@@ -12,7 +12,7 @@ namespace StreetFighter
     public partial class Form1 : Form
     {
         bool CrossMovement;
-        // Prueba commit
+
         #region Player1Initialization
         bool P1Left;
         bool P1Right;
