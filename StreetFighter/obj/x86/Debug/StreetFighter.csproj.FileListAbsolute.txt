@@ -1,0 +1,26 @@
+E:\Mawaat\StreetFighter\StreetFighter\bin\Debug\StreetFighter.exe
+E:\Mawaat\StreetFighter\StreetFighter\bin\Debug\StreetFighter.pdb
+E:\Mawaat\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.Form1.resources
+E:\Mawaat\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.Properties.Resources.resources
+E:\Mawaat\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.csproj.GenerateResource.Cache
+E:\Mawaat\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.exe
+E:\Mawaat\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.pdb
+E:\Mawaat\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.csprojResolveAssemblyReference.cache
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.exe
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.pdb
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\bin\Debug\StreetFighter.exe
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\bin\Debug\StreetFighter.pdb
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.csprojResolveAssemblyReference.cache
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.Form1.resources
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.Properties.Resources.resources
+C:\Users\jsara\Google Drive\9no Semestre\.Net Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.csproj.GenerateResource.Cache
+C:\Users\jsara\Google Drive\9no Semestre\.Net C# Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.exe
+C:\Users\jsara\Google Drive\9no Semestre\.Net C# Opt.IV - Jueves\Proyecto Final\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.pdb
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.exe
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.pdb
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\bin\Debug\StreetFighter.exe
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\bin\Debug\StreetFighter.pdb
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.csprojResolveAssemblyReference.cache
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.Form1.resources
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.Properties.Resources.resources
+C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.csproj.GenerateResource.Cache
