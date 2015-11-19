@@ -25,3 +25,10 @@ C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\Street
 C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.Properties.Resources.resources
 C:\Users\Jose Saracho\Documents\Visual Studio 2015\Projects\StreetFighter\StreetFighter\obj\x86\Debug\StreetFighter.csproj.GenerateResource.Cache
 C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\obj\x86\Debug\StreetFighter.pdb
+C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\bin\Debug\StreetFighter.exe
+C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\bin\Debug\StreetFighter.pdb
+C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\obj\x86\Debug\StreetFighter.csprojResolveAssemblyReference.cache
+C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\obj\x86\Debug\StreetFighter.Form1.resources
+C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\obj\x86\Debug\StreetFighter.Properties.Resources.resources
+C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\obj\x86\Debug\StreetFighter.csproj.GenerateResource.Cache
+C:\Users\Jose Saracho\Documents\GitHubVisualStudio\SF-2015\StreetFighter\obj\x86\Debug\StreetFighter.exe

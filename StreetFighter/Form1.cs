@@ -728,6 +728,7 @@ namespace StreetFighter
                                 golpe.Play();
                                 MessageBox.Show("Player 1 Win");
                                 PBplayer2.Value = 1;
+                                Application.Restart();
                             }
                         }
                     }
@@ -752,6 +753,7 @@ namespace StreetFighter
                                 golpe.Play();
                                 MessageBox.Show("Player 1 Win");
                                 PBplayer2.Value = 1;
+                                Application.Restart();
                             }
                         }
                     }
@@ -797,6 +799,7 @@ namespace StreetFighter
                     golpe.Play();
                     MessageBox.Show("Player 1 Win");
                     PBplayer2.Value = 1;
+                    Application.Restart();
                 }
                 if (!(PBplayer1.Value < 5))
                 {
@@ -881,6 +884,7 @@ namespace StreetFighter
                     PBplayer1.Value = 1;
                     System.Media.SoundPlayer golpe = new System.Media.SoundPlayer(StreetFighter.Properties.Resources.player_win);
                     golpe.Play();
+                    Application.Restart();
                 }
 
             }
@@ -970,6 +974,7 @@ namespace StreetFighter
                     timer1.Stop();
                     MessageBox.Show("Player1 Win");
                     PBplayer2.Value = 1;
+                    Application.Restart();
                 }
                 if (!(PBplayer2.Value < 5))
                 {
@@ -1005,6 +1010,7 @@ namespace StreetFighter
                                 timer1.Stop();
                                 MessageBox.Show("Player2 Win");
                                 PBplayer1.Value = 1;
+                                Application.Restart();
                             }
                         }
                     }
@@ -1064,6 +1070,7 @@ namespace StreetFighter
                     timer1.Stop();
                     MessageBox.Show("Player2 Win");
                     PBplayer1.Value = 1;
+                    Application.Restart();
                 }
 
             }
