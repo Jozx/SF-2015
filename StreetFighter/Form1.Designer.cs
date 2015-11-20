@@ -84,7 +84,6 @@
             // 
             this.screen.BackColor = System.Drawing.Color.Transparent;
             this.screen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.screen.Dock = System.Windows.Forms.DockStyle.Fill;
             this.screen.Location = new System.Drawing.Point(0, 0);
             this.screen.Name = "screen";
             this.screen.Size = new System.Drawing.Size(607, 303);
@@ -104,7 +103,7 @@
             this.DoubleBuffered = true;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form1";
+            this.Text = "Steet Fighter";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);

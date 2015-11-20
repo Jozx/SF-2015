@@ -6,11 +6,167 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace StreetFighter
 {
     public partial class Form1 : Form
     {
+        bool kenOutOfBounds = false;
+        bool ryuOutOfBounds = false;
+        bool kenCollision = false;
+        bool ryuCollision = false;
+        Point pointRight;
+        Point pointLeft;
+
+        private void MicroTimerTest()
+        {
+            // Instantiate new MicroTimer and add event handler
+            MicroLibrary.MicroTimer microTimer = new MicroLibrary.MicroTimer();
+            microTimer.MicroTimerElapsed +=
+                new MicroLibrary.MicroTimer.MicroTimerElapsedEventHandler(OnTimedEvent);
+
+            microTimer.Interval = 1000; // Call micro timer every 1000µs (1ms)
+
+            // Can choose to ignore event if late by Xµs (by default will try to catch up)
+            // microTimer.IgnoreEventIfLateBy = 500; // 500µs (0.5ms)
+
+            microTimer.Enabled = true; // Start timer
+
+            // Do something whilst events happening, for demo sleep 2000ms (2sec)
+            //System.Threading.Thread.Sleep(2000);
+
+            //microTimer.Enabled = false; // Stop timer (executes asynchronously)
+
+            // Alternatively can choose stop here until current timer event has finished
+            // microTimer.StopAndWait(); // Stop timer (waits for timer thread to terminate)
+
+            // Wait for user input
+        }
+
+
+
+        private void OnTimedEvent(object sender, MicroLibrary.MicroTimerEventArgs timerEventArgs)
+        {
+            //<>
+            if (KEN.Right >= RYU.Left + 10)
+            {
+                kenCollision = true;
+
+                if (KEN.InvokeRequired)
+                {
+
+                    KEN.Invoke(new Action(() => KEN.Left = RYU.Left - RYU.Width + 10));
+                }
+                else
+                {
+
+                    KEN.Left = RYU.Left - RYU.Width + 10;
+                }
+
+
+            }
+            else
+            {
+                kenCollision = false;
+            }
+
+            if (RYU.Left < KEN.Right - 10)
+            {
+                ryuCollision = true;
+
+                if (RYU.InvokeRequired)
+                {
+
+                    RYU.Invoke(new Action(() => RYU.Left = KEN.Right - 10));
+                }
+                else
+                {
+
+                    RYU.Left = KEN.Right - 10;
+                }
+
+
+            }
+            else
+            {
+                ryuCollision = false;
+            }
+
+
+
+
+            #region outOfBounds
+            if (KEN.Right > screen.Right)
+            {
+                kenOutOfBounds = true;
+                if (KEN.InvokeRequired)
+                {
+                    KEN.Invoke(new Action(() => KEN.Left = pointRight.X));
+                }
+                else
+                {
+                    KEN.Left = pointRight.X;
+                }
+            }
+            else
+            {
+                kenOutOfBounds = false;
+            }
+
+            if (KEN.Left < screen.Left)
+            {
+                kenOutOfBounds = true;
+                if (KEN.InvokeRequired)
+                {
+                    KEN.Invoke(new Action(() => KEN.Left = pointLeft.X));
+                }
+                else
+                {
+                    KEN.Left = pointLeft.X;
+                }
+            }
+            else
+            {
+                kenOutOfBounds = false;
+            }
+
+            if (RYU.Left < screen.Left)
+            {
+                ryuOutOfBounds = true;
+                if (RYU.InvokeRequired)
+                {
+                    RYU.Invoke(new Action(() => RYU.Left = pointLeft.X));
+                }
+                else
+                {
+                    RYU.Left = pointLeft.X;
+                }
+            }
+            else
+            {
+                ryuOutOfBounds = false;
+            }
+
+            if (RYU.Right > screen.Right)
+            {
+                ryuOutOfBounds = true;
+                if (RYU.InvokeRequired)
+                {
+                    RYU.Invoke(new Action(() => RYU.Left = pointRight.X));
+                }
+                else
+                {
+                    RYU.Left = pointRight.X;
+                }
+            }
+            else
+            {
+                ryuOutOfBounds = false;
+            }
+            #endregion
+        }
+
         bool CrossMovement;
 
         #region Player1Initialization
@@ -32,12 +188,15 @@ namespace StreetFighter
         public Form1()
         {
             InitializeComponent();
+            MicroTimerTest();
+            pointRight = new Point(screen.Right - KEN.Width, KEN.Top);
+            pointLeft = new Point(screen.Left, KEN.Top);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-          screen.Image = StreetFighter.Properties.Resources.SfBG;
-         
+            screen.Image = StreetFighter.Properties.Resources.SfBG;
+
             RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftIdle;
             KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
 
@@ -67,13 +226,21 @@ namespace StreetFighter
                 #region Right
                 if (e.KeyCode == Keys.Right)
                 {
-                    P1Right = true;
+                    if (!kenOutOfBounds)
+                    {
+
+                        if (!kenCollision)
+                        {
+                            P1Right = true;
+                        }
+                    }
+
+
                     if (P1jump != true)
                     {
-                     //  KEN.BackColor = Color.Yellow;
-                       KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
-                       KEN.BackgroundImageLayout = ImageLayout.Stretch;
-          
+                        KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
+                        KEN.BackgroundImageLayout = ImageLayout.Stretch;
+
                     }
 
                 }
@@ -81,14 +248,14 @@ namespace StreetFighter
                 #region Left
                 if (e.KeyCode == Keys.Left)
                 {
-
                     P1Left = true;
+
                     if (P1jump != true)
-                    { 
-                       // KEN.BackColor = Color.Blue;
-                    KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
-                    KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                       
+                    {
+                        // KEN.BackColor = Color.Blue;
+                        KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
+                        KEN.BackgroundImageLayout = ImageLayout.Stretch;
+
                     }
 
                 }
@@ -121,13 +288,14 @@ namespace StreetFighter
                 #region Right
                 if (e.KeyCode == Keys.L)
                 {
+
                     P2Right = true;
                     if (P2jump != true)
                     {
-                     //  RYU.BackColor = Color.Yellow;
-                       RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
-                       RYU.BackgroundImageLayout = ImageLayout.Stretch;
-                       
+                        //  RYU.BackColor = Color.Yellow;
+                        RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
+                        RYU.BackgroundImageLayout = ImageLayout.Stretch;
+
                     }
 
                 }
@@ -135,14 +303,20 @@ namespace StreetFighter
                 #region Left
                 if (e.KeyCode == Keys.J)
                 {
+                    if (!ryuOutOfBounds)
+                    {
+                        if (!ryuCollision)
+                        {
+                            P2Left = true;
+                        }
+                    }
 
-                    P2Left = true;
                     if (P2jump != true)
                     {
-                     //  RYU.BackColor = Color.Blue;
-                       RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
-                       RYU.BackgroundImageLayout = ImageLayout.Stretch;
-                      
+                        //  RYU.BackColor = Color.Blue;
+                        RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
+                        RYU.BackgroundImageLayout = ImageLayout.Stretch;
+
 
                     }
 
@@ -181,13 +355,17 @@ namespace StreetFighter
                 #region Right
                 if (e.KeyCode == Keys.Right)
                 {
-                    P1Right = true;
+                    if (!kenOutOfBounds)
+                    {
+                        P1Right = true;
+                    }
+
+
                     if (P1jump != true)
                     {
-                       //KEN.BackColor = Color.DarkMagenta;
-                       KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
-                       KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                      
+                        KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
+                        KEN.BackgroundImageLayout = ImageLayout.Stretch;
+
                     }
 
                 }
@@ -199,10 +377,10 @@ namespace StreetFighter
                     P1Left = true;
                     if (P1jump != true)
                     {
-                       // KEN.BackColor = Color.DarkBlue;
+                        // KEN.BackColor = Color.DarkBlue;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                    
+
                     }
 
                 }
@@ -233,7 +411,7 @@ namespace StreetFighter
                     P2Right = true;
                     if (P2jump != true)
                     {
-                      //  RYU.BackColor = Color.DarkMagenta;
+                        //  RYU.BackColor = Color.DarkMagenta;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -247,10 +425,10 @@ namespace StreetFighter
                     P2Left = true;
                     if (P2jump != true)
                     {
-                       // RYU.BackColor = Color.DarkBlue;
+                        // RYU.BackColor = Color.DarkBlue;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
-                     
+
                     }
 
                 }
@@ -293,20 +471,20 @@ namespace StreetFighter
                 if (e.KeyCode == Keys.Right)
                 {
                     P1Right = false;
-              //  KEN.BackColor = Color.Red;
-                KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
-                KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                 
+                    //  KEN.BackColor = Color.Red;
+                    KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
+                    KEN.BackgroundImageLayout = ImageLayout.Stretch;
+
                 }
                 #endregion
                 #region Left
                 if (e.KeyCode == Keys.Left)
                 {
                     P1Left = false;
-               //  KEN.BackColor = Color.Red;
-                 KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
-                 KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                  
+                    //  KEN.BackColor = Color.Red;
+                    KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
+                    KEN.BackgroundImageLayout = ImageLayout.Stretch;
+
                 }
                 #endregion
                 #region Up
@@ -314,17 +492,17 @@ namespace StreetFighter
                 {
                     if (P1Right == true)
                     {
-                   //     KEN.BackColor = Color.Yellow;
+                        //     KEN.BackColor = Color.Yellow;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
 
                     }
                     else if (P1Left == true)
                     {
-                      //  KEN.BackColor = Color.Blue;
+                        //  KEN.BackColor = Color.Blue;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                       
+
                     }
                 }
                 #endregion
@@ -334,26 +512,26 @@ namespace StreetFighter
                     if (P1Left != true && P1Right != true)
                     {
                         P1Punch = false;
-                     //   KEN.BackColor = Color.Red;
+                        //   KEN.BackColor = Color.Red;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                       
+
                     }
                     if (P1Left == true)
                     {
                         P1Punch = false;
-                    //    KEN.BackColor = Color.Blue;
+                        //    KEN.BackColor = Color.Blue;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                      
+
                     }
                     if (P1Right == true)
                     {
                         P1Punch = false;
-                      //  KEN.BackColor = Color.Yellow;
+                        //  KEN.BackColor = Color.Yellow;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                   
+
                     }
                 }
                 #endregion
@@ -364,26 +542,26 @@ namespace StreetFighter
                     if (P1Left != true && P1Right != true)
                     {
                         P1Kick = false;
-                       // KEN.BackColor = Color.Red;
+                        // KEN.BackColor = Color.Red;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                       
+
                     }
                     if (P1Left == true)
                     {
                         P1Kick = false;
-                    //    KEN.BackColor = Color.Blue;
+                        //    KEN.BackColor = Color.Blue;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                       
+
                     }
                     if (P1Right == true)
                     {
                         P1Kick = false;
-                       // KEN.BackColor = Color.Yellow;
+                        // KEN.BackColor = Color.Yellow;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                    
+
                     }
                 }
                 #endregion
@@ -393,17 +571,17 @@ namespace StreetFighter
                 if (e.KeyCode == Keys.L)
                 {
                     P2Right = false;
-                   // RYU.BackColor = Color.Red;
+                    // RYU.BackColor = Color.Red;
                     RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftIdle;
                     RYU.BackgroundImageLayout = ImageLayout.Stretch;
-                   
+
                 }
                 #endregion
                 #region Left
                 if (e.KeyCode == Keys.J)
                 {
                     P2Left = false;
-                 //   RYU.BackColor = Color.Red;
+                    //   RYU.BackColor = Color.Red;
                     RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftIdle;
                     RYU.BackgroundImageLayout = ImageLayout.Stretch;
                 }
@@ -413,13 +591,13 @@ namespace StreetFighter
                 {
                     if (P2Right == true)
                     {
-                      //  RYU.BackColor = Color.Yellow;
+                        //  RYU.BackColor = Color.Yellow;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     else if (P2Left == true)
                     {
-                       // RYU.BackColor = Color.Blue;
+                        // RYU.BackColor = Color.Blue;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -431,22 +609,22 @@ namespace StreetFighter
                     if (P2Left != true && P2Right != true)
                     {
                         P2Punch = false;
-                       // RYU.BackColor = Color.Red;
+                        // RYU.BackColor = Color.Red;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftIdle;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P2Left == true)
                     {
                         P2Punch = false;
-                     //   RYU.BackColor = Color.Blue;
+                        //   RYU.BackColor = Color.Blue;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P2Right == true)
                     {
                         P2Punch = false;
-                      //  RYU.BackColor = Color.Yellow;
-                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
+                        //  RYU.BackColor = Color.Yellow;
+                        RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                 }
@@ -458,21 +636,21 @@ namespace StreetFighter
                     if (P2Left != true && P2Right != true)
                     {
                         P2Kick = false;
-                     //   RYU.BackColor = Color.Red;
+                        //   RYU.BackColor = Color.Red;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftIdle;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P2Left == true)
                     {
                         P2Kick = false;
-                      //  RYU.BackColor = Color.Blue;
+                        //  RYU.BackColor = Color.Blue;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P2Right == true)
                     {
                         P2Kick = false;
-                       // RYU.BackColor = Color.Yellow;
+                        // RYU.BackColor = Color.Yellow;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -499,7 +677,7 @@ namespace StreetFighter
                 if (e.KeyCode == Keys.Left)
                 {
                     P1Left = false;
-                   // KEN.BackColor = Color.DarkRed;
+                    // KEN.BackColor = Color.DarkRed;
                     KEN.Image = StreetFighter.Properties.Resources.GifKenLeftIdle;
                     KEN.BackgroundImageLayout = ImageLayout.Stretch;
                 }
@@ -509,13 +687,13 @@ namespace StreetFighter
                 {
                     if (P1Right == true)
                     {
-                       // KEN.BackColor = Color.DarkMagenta;
+                        // KEN.BackColor = Color.DarkMagenta;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     else if (P1Left == true)
                     {
-                       // KEN.BackColor = Color.DarkBlue;
+                        // KEN.BackColor = Color.DarkBlue;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -527,21 +705,21 @@ namespace StreetFighter
                     if (P1Left != true && P1Right != true)
                     {
                         P1Punch = false;
-                       // KEN.BackColor = Color.DarkRed;
+                        // KEN.BackColor = Color.DarkRed;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenLeftIdle;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P1Left == true)
                     {
                         P1Punch = false;
-                      //  KEN.BackColor = Color.DarkBlue;
+                        //  KEN.BackColor = Color.DarkBlue;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P1Right == true)
                     {
                         P1Punch = false;
-                       // KEN.BackColor = Color.DarkMagenta;
+                        // KEN.BackColor = Color.DarkMagenta;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -554,7 +732,7 @@ namespace StreetFighter
                     if (P1Left != true && P1Right != true)
                     {
                         P1Kick = false;
-                       // KEN.BackColor = Color.DarkRed;
+                        // KEN.BackColor = Color.DarkRed;
                         KEN.Image = StreetFighter.Properties.Resources.GifKenLeftIdle;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -568,8 +746,8 @@ namespace StreetFighter
                     if (P1Right == true)
                     {
                         P1Kick = false;
-                       // KEN.BackColor = Color.DarkMagenta;
-                          KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
+                        // KEN.BackColor = Color.DarkMagenta;
+                        KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                 }
@@ -580,7 +758,7 @@ namespace StreetFighter
                 if (e.KeyCode == Keys.L)
                 {
                     P2Right = false;
-                   // RYU.BackColor = Color.DarkRed;
+                    // RYU.BackColor = Color.DarkRed;
                     RYU.Image = StreetFighter.Properties.Resources.GifRyuRightIdle;
                     RYU.BackgroundImageLayout = ImageLayout.Stretch;
 
@@ -590,7 +768,7 @@ namespace StreetFighter
                 if (e.KeyCode == Keys.J)
                 {
                     P2Left = false;
-                  //  RYU.BackColor = Color.DarkRed;
+                    //  RYU.BackColor = Color.DarkRed;
                     RYU.Image = StreetFighter.Properties.Resources.GifRyuRightIdle;
                     RYU.BackgroundImageLayout = ImageLayout.Stretch;
                 }
@@ -606,7 +784,7 @@ namespace StreetFighter
                     }
                     else if (P2Left == true)
                     {
-                       // RYU.BackColor = Color.DarkBlue;
+                        // RYU.BackColor = Color.DarkBlue;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -618,21 +796,21 @@ namespace StreetFighter
                     if (P2Left != true && P2Right != true)
                     {
                         P2Punch = false;
-                      //  RYU.BackColor = Color.DarkRed;
+                        //  RYU.BackColor = Color.DarkRed;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightIdle;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P2Left == true)
                     {
                         P2Punch = false;
-                       // RYU.BackColor = Color.DarkBlue;
+                        // RYU.BackColor = Color.DarkBlue;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     if (P2Right == true)
                     {
                         P2Punch = false;
-                      //  RYU.BackColor = Color.DarkMagenta;
+                        //  RYU.BackColor = Color.DarkMagenta;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
 
@@ -646,7 +824,7 @@ namespace StreetFighter
                     if (P2Left != true && P2Right != true)
                     {
                         P2Kick = false;
-                       // RYU.BackColor = Color.DarkRed;
+                        // RYU.BackColor = Color.DarkRed;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightIdle;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
 
@@ -654,7 +832,7 @@ namespace StreetFighter
                     if (P2Left == true)
                     {
                         P2Kick = false;
-                       // RYU.BackColor = Color.DarkBlue;
+                        // RYU.BackColor = Color.DarkBlue;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
 
@@ -662,7 +840,7 @@ namespace StreetFighter
                     if (P2Right == true)
                     {
                         P2Kick = false;
-                       // RYU.BackColor = Color.DarkMagenta;
+                        // RYU.BackColor = Color.DarkMagenta;
                         RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                     }
@@ -736,7 +914,7 @@ namespace StreetFighter
                     #region Kick
                     if (P1Kick == true)
                     {
-                      //  KEN.BackColor = Color.White;
+                        //  KEN.BackColor = Color.White;
                         KEN.Image = StreetFighter.Properties.Resources.KenRightKick;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                         if (KEN.Bounds.IntersectsWith(RYU.Bounds))
@@ -763,30 +941,20 @@ namespace StreetFighter
                     {
                         Player1JumpCMF(KEN);
                         if (P1Left == true)
-                        {
-                           // KEN.BackColor = Color.Green;
-                        }
-                        if (P1Right == true)
-                        {
-                          //  KEN.BackColor = Color.Green;
-                        }
-                        if (P1Left != true && P1Right != true && P1jump != true)
-                        {
-                           // KEN.BackColor = Color.Red;
-                            KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
-                            KEN.BackgroundImageLayout = ImageLayout.Stretch;
-                        }
+                            if (P1Left != true && P1Right != true && P1jump != true)
+                            {
+                                KEN.Image = StreetFighter.Properties.Resources.GifKenRightIdle;
+                                KEN.BackgroundImageLayout = ImageLayout.Stretch;
+                            }
                         if (P1jump == false && P1Right == true)
                         {
-                          //  KEN.BackColor = Color.Yellow;
                             KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
                             KEN.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (P1jump == false && P1Left == true)
                         {
-                          //  KEN.BackColor = Color.Blue;
-                             KEN.Image=StreetFighter.Properties.Resources.GifKenRightWalkin;
-                             KEN.BackgroundImageLayout = ImageLayout.Stretch;
+                            KEN.Image = StreetFighter.Properties.Resources.GifKenRightWalkin;
+                            KEN.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                     }
                     #endregion
@@ -820,7 +988,7 @@ namespace StreetFighter
                     if (P2Punch == true)
                     {
 
-                       // RYU.BackColor = Color.Black;
+                        // RYU.BackColor = Color.Black;
                         RYU.Image = StreetFighter.Properties.Resources.RyuLeftPunch;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         if (RYU.Bounds.IntersectsWith(KEN.Bounds))
@@ -833,7 +1001,7 @@ namespace StreetFighter
                     #region Kick
                     if (P2Kick == true)
                     {
-                       // RYU.BackColor = Color.White;
+                        // RYU.BackColor = Color.White;
                         RYU.Image = StreetFighter.Properties.Resources.RyuLeftKick;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         if (RYU.Bounds.IntersectsWith(KEN.Bounds))
@@ -847,30 +1015,19 @@ namespace StreetFighter
                     if (P2jump == true)
                     {
                         Player2JumpCMF(RYU);
-                        if (P2Left == true)
-                        {
-                           // RYU.BackColor = Color.Green;
-                        }
-                        if (P2Right == true)
-                        {
-                          //  RYU.BackColor = Color.Green;
-                        }
                         if (P2Left != true && P2Right != true && P2jump != true)
                         {
-                           // RYU.BackColor = Color.Red;
-                            RYU.Image=StreetFighter.Properties.Resources.GifRyuLeftIdle;
+                            RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftIdle;
                             RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (P2jump == false && P2Right == true)
                         {
-                          //  RYU.BackColor = Color.Yellow;
-                            RYU.Image=StreetFighter.Properties.Resources.GifRyuLeftWalkin;
+                            RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                             RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (P2jump == false && P2Left == true)
                         {
-                          //  RYU.BackColor = Color.Blue;
-                            RYU.Image=StreetFighter.Properties.Resources.GifRyuLeftWalkin;
+                            RYU.Image = StreetFighter.Properties.Resources.GifRyuLeftWalkin;
                             RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                     }
@@ -888,7 +1045,7 @@ namespace StreetFighter
                 }
 
             }
-#endregion
+            #endregion
             #region CRMT
             else if (CrossMovement == true)
             {
@@ -911,7 +1068,7 @@ namespace StreetFighter
                     if (P1Punch == true)
                     {
 
-                       // KEN.BackColor = Color.Black;
+                        // KEN.BackColor = Color.Black;
                         KEN.Image = StreetFighter.Properties.Resources.KenLeftPunch;
                         KEN.BackgroundImageLayout = ImageLayout.Stretch;
                         if (KEN.Bounds.IntersectsWith(RYU.Bounds))
@@ -940,29 +1097,29 @@ namespace StreetFighter
                         Player1JumpCMT(KEN);
                         if (P1Left == true)
                         {
-                          //  KEN.BackColor = Color.DarkGreen;
+                            //  KEN.BackColor = Color.DarkGreen;
                         }
                         if (P1Right == true)
                         {
-                           // KEN.BackColor = Color.DarkGreen;
+                            // KEN.BackColor = Color.DarkGreen;
                         }
                         if (P1Left != true && P1Right != true && P1jump != true)
                         {
-                          //  KEN.BackColor = Color.DarkRed;
-                            KEN.Image=StreetFighter.Properties.Resources.GifKenLeftIdle;
+                            //  KEN.BackColor = Color.DarkRed;
+                            KEN.Image = StreetFighter.Properties.Resources.GifKenLeftIdle;
                             KEN.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (P1jump == false && P1Right == true)
                         {
                             //KEN.BackColor = Color.DarkMagenta;
-                            KEN.Image=StreetFighter.Properties.Resources.GifKenLeftWalkin;
+                            KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
                             KEN.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (P1jump == false && P1Left == true)
                         {
                             //KEN.BackColor = Color.DarkBlue;
-                              KEN.Image=StreetFighter.Properties.Resources.GifKenLeftWalkin;
-                              KEN.BackgroundImageLayout = ImageLayout.Stretch;
+                            KEN.Image = StreetFighter.Properties.Resources.GifKenLeftWalkin;
+                            KEN.BackgroundImageLayout = ImageLayout.Stretch;
 
                         }
                     }
@@ -1018,16 +1175,16 @@ namespace StreetFighter
                     #region Kick
                     if (P2Kick == true)
                     {
-                      //  RYU.BackColor = Color.White;
+                        //  RYU.BackColor = Color.White;
                         RYU.Image = StreetFighter.Properties.Resources.RyuRightKick;
                         RYU.BackgroundImageLayout = ImageLayout.Stretch;
 
                         if (RYU.Bounds.IntersectsWith(RYU.Bounds))
                         {
-                            
-                                PBplayer1.Value -= 5;
-                                P2Kick = false;
-                            
+
+                            PBplayer1.Value -= 5;
+                            P2Kick = false;
+
                         }
                     }
                     #endregion
@@ -1035,31 +1192,24 @@ namespace StreetFighter
                     if (P2jump == true)
                     {
                         Player2JumpCMT(RYU);
-                        if (P2Left == true)
-                        {
-                            RYU.BackColor = Color.DarkGreen;
-                        }
-                        if (P2Right == true)
-                        {
-                         //   RYU.BackColor = Color.DarkGreen;
-                        }
+
                         if (P2Left != true && P2Right != true && P2jump != true)
                         {
-                          //  RYU.BackColor = Color.DarkRed;
-                            RYU.Image=StreetFighter.Properties.Resources.GifRyuRightIdle;
+                            //  RYU.BackColor = Color.DarkRed;
+                            RYU.Image = StreetFighter.Properties.Resources.GifRyuRightIdle;
                             RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (P2jump == false && P2Right == true)
                         {
-                          //  RYU.BackColor = Color.DarkMagenta;
-                             RYU.Image=StreetFighter.Properties.Resources.GifRyuRightWalkin;
-                             RYU.BackgroundImageLayout = ImageLayout.Stretch;
+                            //  RYU.BackColor = Color.DarkMagenta;
+                            RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
+                            RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (P2jump == false && P2Left == true)
                         {
-                           // RYU.BackColor = Color.DarkBlue;
-                             RYU.Image=StreetFighter.Properties.Resources.GifRyuRightWalkin;
-                             RYU.BackgroundImageLayout = ImageLayout.Stretch;
+                            // RYU.BackColor = Color.DarkBlue;
+                            RYU.Image = StreetFighter.Properties.Resources.GifRyuRightWalkin;
+                            RYU.BackgroundImageLayout = ImageLayout.Stretch;
                         }
                     }
                     #endregion
@@ -1074,13 +1224,13 @@ namespace StreetFighter
                 }
 
             }
-#endregion
+            #endregion
             #endregion
         }
         #region PlayerJump1CMFalse
         void Player1JumpCMF(PictureBox Player)
         {
-           // Player.BackColor = Color.Green;
+            // Player.BackColor = Color.Green;
             P1JumpCounter++;
             if (P1JumpCounter <= 10)
             {
@@ -1091,8 +1241,8 @@ namespace StreetFighter
             else if (P1JumpCounter > 10 && P1JumpCounter <= 15)
             {
                 Player.Location = new Point(Player.Location.X, Player.Location.Y - 4);
-                 Player.Image=StreetFighter.Properties.Resources.KenRightJump2;
-                 Player.BackgroundImageLayout = ImageLayout.Stretch;
+                Player.Image = StreetFighter.Properties.Resources.KenRightJump2;
+                Player.BackgroundImageLayout = ImageLayout.Stretch;
             }
             else if (P1JumpCounter > 15 && P1JumpCounter <= 20)
             {
@@ -1110,25 +1260,25 @@ namespace StreetFighter
             {
                 P1jump = false;
                 P1JumpCounter = 0;
-              //  Player.BackColor = Color.Red;
+                //  Player.BackColor = Color.Red;
             }
         }
         #endregion
         #region PlayerJump2CMFalse
         void Player2JumpCMF(PictureBox Player)
         {
-          //  Player.BackColor = Color.Green;
+            //  Player.BackColor = Color.Green;
             P2JumpCounter++;
             if (P2JumpCounter <= 10)
             {
                 Player.Location = new Point(Player.Location.X, Player.Location.Y - 6);
-                Player.Image=StreetFighter.Properties.Resources.RyuLeftJump1;
+                Player.Image = StreetFighter.Properties.Resources.RyuLeftJump1;
                 Player.BackgroundImageLayout = ImageLayout.Stretch;
-            }      
+            }
             else if (P2JumpCounter > 10 && P2JumpCounter <= 15)
             {
                 Player.Location = new Point(Player.Location.X, Player.Location.Y - 4);
-                Player.Image=StreetFighter.Properties.Resources.RyuLeftJump2;
+                Player.Image = StreetFighter.Properties.Resources.RyuLeftJump2;
                 Player.BackgroundImageLayout = ImageLayout.Stretch;
 
             }
@@ -1148,7 +1298,7 @@ namespace StreetFighter
             {
                 P2jump = false;
                 P2JumpCounter = 0;
-            //    Player.BackColor = Color.Red;
+                //    Player.BackColor = Color.Red;
             }
         }
         #endregion
@@ -1156,7 +1306,7 @@ namespace StreetFighter
         #region PlayerJump1CMTrue
         void Player1JumpCMT(PictureBox Player)
         {
-           // Player.BackColor = Color.DarkGreen;
+            // Player.BackColor = Color.DarkGreen;
             P1JumpCounter++;
             if (P1JumpCounter <= 10)
             {
@@ -1170,14 +1320,14 @@ namespace StreetFighter
                 Player.Image = StreetFighter.Properties.Resources.KenLeftJump2;
                 Player.BackgroundImageLayout = ImageLayout.Stretch;
             }
-             
+
             else if (P1JumpCounter > 15 && P1JumpCounter <= 20)
-            
+
             {
                 Player.Location = new Point(Player.Location.X, Player.Location.Y + 4);
                 Player.Image = StreetFighter.Properties.Resources.KenLeftJump2;
                 Player.BackgroundImageLayout = ImageLayout.Stretch;
-            
+
             }
             else if (P1JumpCounter > 20 && P1JumpCounter <= 30)
             {
@@ -1189,19 +1339,19 @@ namespace StreetFighter
             {
                 P1jump = false;
                 P1JumpCounter = 0;
-               // Player.BackColor = Color.DarkRed;
+                // Player.BackColor = Color.DarkRed;
             }
         }
         #endregion
         #region PlayerJump2CMTrue
         void Player2JumpCMT(PictureBox Player)
         {
-           // Player.BackColor = Color.DarkGreen;
+            // Player.BackColor = Color.DarkGreen;
             P2JumpCounter++;
             if (P2JumpCounter <= 10)
             {
                 Player.Location = new Point(Player.Location.X, Player.Location.Y - 6);
-                Player.Image=StreetFighter.Properties.Resources.RyuRightJump1;
+                Player.Image = StreetFighter.Properties.Resources.RyuRightJump1;
                 Player.BackgroundImageLayout = ImageLayout.Stretch;
             }
             else if (P2JumpCounter > 10 && P2JumpCounter <= 15)
@@ -1226,14 +1376,263 @@ namespace StreetFighter
             {
                 P2jump = false;
                 P2JumpCounter = 0;
-               // Player.BackColor = Color.DarkRed;
+                // Player.BackColor = Color.DarkRed;
             }
-        #endregion 
+            #endregion
         }
 
-        private void screen_Paint(object sender, PaintEventArgs e)
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-
+            //Environment.Exit(1);
+            //this.Dispose();
+            //CerrarAplicacion();
         }
+
+        private void CerrarAplicacion()
+        {
+            if (System.Windows.Forms.Application.MessageLoop)
+            {
+                // Use this since we are a WinForms app
+                System.Windows.Forms.Application.Exit();
+            }
+            else
+            {
+                // Use this since we are a console app
+                System.Environment.Exit(1);
+            }
+        }
+    }
+}
+
+namespace MicroLibrary
+{
+    /// <summary>
+    /// MicroStopwatch class
+    /// </summary>
+    public class MicroStopwatch : System.Diagnostics.Stopwatch
+    {
+        readonly double _microSecPerTick =
+            1000000D / System.Diagnostics.Stopwatch.Frequency;
+
+        public MicroStopwatch()
+        {
+            if (!System.Diagnostics.Stopwatch.IsHighResolution)
+            {
+                throw new Exception("On this system the high-resolution " +
+                                    "performance counter is not available");
+            }
+        }
+
+        public long ElapsedMicroseconds
+        {
+            get
+            {
+                return (long)(ElapsedTicks * _microSecPerTick);
+            }
+        }
+    }
+
+    /// <summary>
+    /// MicroTimer class
+    /// </summary>
+    public class MicroTimer
+    {
+        public delegate void MicroTimerElapsedEventHandler(
+                             object sender,
+                             MicroTimerEventArgs timerEventArgs);
+        public event MicroTimerElapsedEventHandler MicroTimerElapsed;
+
+        System.Threading.Thread _threadTimer = null;
+        long _ignoreEventIfLateBy = long.MaxValue;
+        long _timerIntervalInMicroSec = 0;
+        bool _stopTimer = true;
+
+        public MicroTimer()
+        {
+        }
+
+        public MicroTimer(long timerIntervalInMicroseconds)
+        {
+            Interval = timerIntervalInMicroseconds;
+        }
+
+        public long Interval
+        {
+            get
+            {
+                return System.Threading.Interlocked.Read(
+                    ref _timerIntervalInMicroSec);
+            }
+            set
+            {
+                System.Threading.Interlocked.Exchange(
+                    ref _timerIntervalInMicroSec, value);
+            }
+        }
+
+        public long IgnoreEventIfLateBy
+        {
+            get
+            {
+                return System.Threading.Interlocked.Read(
+                    ref _ignoreEventIfLateBy);
+            }
+            set
+            {
+                System.Threading.Interlocked.Exchange(
+                    ref _ignoreEventIfLateBy, value <= 0 ? long.MaxValue : value);
+            }
+        }
+
+        public bool Enabled
+        {
+            set
+            {
+                if (value)
+                {
+                    Start();
+                }
+                else
+                {
+                    Stop();
+                }
+            }
+            get
+            {
+                return (_threadTimer != null && _threadTimer.IsAlive);
+            }
+        }
+
+        public void Start()
+        {
+            if (Enabled || Interval <= 0)
+            {
+                return;
+            }
+
+            _stopTimer = false;
+
+            System.Threading.ThreadStart threadStart = delegate ()
+            {
+                NotificationTimer(ref _timerIntervalInMicroSec,
+                                  ref _ignoreEventIfLateBy,
+                                  ref _stopTimer);
+            };
+
+            _threadTimer = new System.Threading.Thread(threadStart);
+            _threadTimer.Priority = System.Threading.ThreadPriority.Highest;
+            _threadTimer.Start();
+        }
+
+        public void Stop()
+        {
+            _stopTimer = true;
+        }
+
+        public void StopAndWait()
+        {
+            StopAndWait(System.Threading.Timeout.Infinite);
+        }
+
+        public bool StopAndWait(int timeoutInMilliSec)
+        {
+            _stopTimer = true;
+
+            if (!Enabled || _threadTimer.ManagedThreadId ==
+                System.Threading.Thread.CurrentThread.ManagedThreadId)
+            {
+                return true;
+            }
+
+            return _threadTimer.Join(timeoutInMilliSec);
+        }
+
+        public void Abort()
+        {
+            _stopTimer = true;
+
+            if (Enabled)
+            {
+                _threadTimer.Abort();
+            }
+        }
+
+        void NotificationTimer(ref long timerIntervalInMicroSec,
+                               ref long ignoreEventIfLateBy,
+                               ref bool stopTimer)
+        {
+            int timerCount = 0;
+            long nextNotification = 0;
+
+            MicroStopwatch microStopwatch = new MicroStopwatch();
+            microStopwatch.Start();
+
+            while (!stopTimer)
+            {
+                long callbackFunctionExecutionTime =
+                    microStopwatch.ElapsedMicroseconds - nextNotification;
+
+                long timerIntervalInMicroSecCurrent =
+                    System.Threading.Interlocked.Read(ref timerIntervalInMicroSec);
+                long ignoreEventIfLateByCurrent =
+                    System.Threading.Interlocked.Read(ref ignoreEventIfLateBy);
+
+                nextNotification += timerIntervalInMicroSecCurrent;
+                timerCount++;
+                long elapsedMicroseconds = 0;
+
+                while ((elapsedMicroseconds = microStopwatch.ElapsedMicroseconds)
+                        < nextNotification)
+                {
+                    System.Threading.Thread.SpinWait(10);
+                }
+
+                long timerLateBy = elapsedMicroseconds - nextNotification;
+
+                if (timerLateBy >= ignoreEventIfLateByCurrent)
+                {
+                    continue;
+                }
+
+                MicroTimerEventArgs microTimerEventArgs =
+                     new MicroTimerEventArgs(timerCount,
+                                             elapsedMicroseconds,
+                                             timerLateBy,
+                                             callbackFunctionExecutionTime);
+                MicroTimerElapsed(this, microTimerEventArgs);
+            }
+
+            microStopwatch.Stop();
+        }
+    }
+
+    /// <summary>
+    /// MicroTimer Event Argument class
+    /// </summary>
+    public class MicroTimerEventArgs : EventArgs
+    {
+        // Simple counter, number times timed event (callback function) executed
+        public int TimerCount { get; private set; }
+
+        // Time when timed event was called since timer started
+        public long ElapsedMicroseconds { get; private set; }
+
+        // How late the timer was compared to when it should have been called
+        public long TimerLateBy { get; private set; }
+
+        // Time it took to execute previous call to callback function (OnTimedEvent)
+        public long CallbackFunctionExecutionTime { get; private set; }
+
+        public MicroTimerEventArgs(int timerCount,
+                                   long elapsedMicroseconds,
+                                   long timerLateBy,
+                                   long callbackFunctionExecutionTime)
+        {
+            TimerCount = timerCount;
+            ElapsedMicroseconds = elapsedMicroseconds;
+            TimerLateBy = timerLateBy;
+            CallbackFunctionExecutionTime = callbackFunctionExecutionTime;
+        }
+
     }
 }
